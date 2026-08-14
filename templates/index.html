@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Password Strength Analyzer</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="header">
+            <div class="shield">🔐</div>
+
+            <h1>Password Strength Analyzer</h1>
+
+            <p>
+                Evaluate your password security and get recommendations
+                for creating stronger passwords.
+            </p>
+        </div>
+
+
+        <div class="card">
+
+            <form method="POST">
+
+                <label for="password">
+                    Enter Password
+                </label>
+
+                <div class="password-box">
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        required
+                    >
+
+                    <button
+                        type="button"
+                        id="togglePassword"
+                        class="toggle-btn"
+                    >
+                        👁
+                    </button>
+
+                </div>
+
+                <button type="submit" name="action" value="analyze" class="analyze-btn">
+                    Analyze Password
+                </button>
+
+            </form>
+
+            <div class="generator">
+
+    <h3>🔐 Need a Strong Password?</h3>
+
+    <p>
+        Generate a random 16-character password.
+    </p>
+
+    <form method="POST" class="save-form">
+
+    <input
+        type="hidden"
+        name="password"
+        value="{{ password }}"
+    >
+
+    <button
+        type="submit"
+        name="action"
+        value="save"
+        class="save-btn"
+    >
+        🔒 Add Password to History
+    </button>
+
+    </form>
+
+
+    {% if generated_password %}
+
+    <div class="generated">
+
+        <input
+            type="text"
+            id="generatedPassword"
+            value="{{ generated_password }}"
+            readonly
+        >
+
+        <button
+            type="button"
+            onclick="copyPassword()"
+        >
+            📋 Copy
+        </button>
+
+    </div>
+
+    {% endif %}
+
+</div>
+            {% if result %}
+
+            <div class="result">
+
+                <div class="strength-header">
+
+                    <span>Password Strength</span>
+
+                    <span class="strength {{ result.strength|lower }}">
+                        {{ result.strength }}
+                    </span>
+
+                </div>
+
+
+                <div class="meter">
+
+                    <div
+                        class="meter-fill {{ result.strength|lower }}"
+                        style="width:
+                        {% if result.strength == 'Weak' %}
+                            33%
+                        {% elif result.strength == 'Moderate' %}
+                            66%
+                        {% else %}
+                            100%
+                        {% endif %};"
+                    >
+                    </div>
+
+                </div>
+
+
+                <div class="score">
+                    Score: <strong>{{ result.score }}/6</strong>
+                </div>
+
+                <div class="entropy">
+                    🔐 Estimated Entropy:
+                <strong>{{ result.entropy }} bits</strong>
+                </div>
+
+                {% if result.reused %}
+
+                <div class="reuse-warning">
+                    ⚠ This password has been used previously.
+                     Consider choosing a new password.
+                </div>
+
+                {% else %}
+
+                <div class="reuse-safe">
+                     ✓ This password has not been found in your password history.
+                </div>
+
+                {% endif %}
+
+                {% if result.suggestions %}
+
+                <div class="suggestions">
+
+                    <h3>🔎 Recommendations</h3>
+
+                    <ul>
+
+                        {% for suggestion in result.suggestions %}
+
+                        <li>{{ suggestion }}</li>
+
+                        {% endfor %}
+
+                    </ul>
+
+                </div>
+
+                {% else %}
+
+                <div class="success">
+
+                    ✅ Excellent! Your password satisfies all
+                    basic security checks.
+
+                </div>
+
+                {% endif %}
+
+            </div>
+
+            {% endif %}
+
+        </div>
+
+        {% if reuse_message %}
+
+<div class="save-message">
+
+    {{ reuse_message }}
+
+</div>
+
+{% endif %}
+
+        <div class="footer">
+
+            <p>
+                Cyber Security Project • Password Security Analyzer
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+
+</html>
